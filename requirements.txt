@@ -1,0 +1,11 @@
+
+uvicorn==0.30.6
+pydantic==2.9.2
+sqlalchemy==2.0.36
+streamlit==1.38.0
+requests==2.32.3
+pytest==8.3.2
+coverage==7.6.1
+sqlglot==11.4.0
+pandas==2.2.3
+openpyxl==3.1.2
