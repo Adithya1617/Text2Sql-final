@@ -10,6 +10,8 @@ from ..executors.sqlite_exec import run_sql
 from ..utils.audit import log_query
 from ..utils.logger import get_logger
 from ..utils import cache as cache_utils
+from ..models.sqlite_syntax_fixer import fix_sqlite_syntax
+from ..models.query_optimizer import analyze_query_performance, check_query_timeout_risk
 
 def initialize_pipeline():
     """Initialize the pipeline and clear any cached data from previous runs"""
@@ -132,6 +134,56 @@ def generate_sql(plan: Plan, question: str) -> Plan:
                             pass
                 except Exception:
                     pass
+    
+    # Apply SQLite syntax fixes
+    try:
+        logger = get_logger("pipeline")
+        fixed_sql, fixes_summary = fix_sqlite_syntax(sql)
+        if fixed_sql != sql:
+            logger.info(f"🔧 Applied SQLite syntax fixes: {fixes_summary}")
+            sql = fixed_sql
+    except Exception as e:
+        logger.warning(f"⚠️ SQLite syntax fixer failed: {e}")
+    
+    # Analyze query performance and apply optimizations
+    try:
+        # Check for timeout risk
+        should_reject, reject_reason = check_query_timeout_risk(sql)
+        if should_reject:
+            logger.warning(f"⚠️ Query rejected due to timeout risk: {reject_reason}")
+            raise ValueError(f"Query timeout risk: {reject_reason}")
+        
+        # Get performance analysis
+        analysis = analyze_query_performance(sql)
+        logger.info(f"📊 Query complexity: {analysis.complexity_score} ({analysis.risk_level} risk)")
+        logger.info(f"📈 Query metrics: {analysis.table_count} tables, {analysis.join_count} JOINs, {analysis.subquery_count} subqueries")
+        
+        # Apply optimized SQL if available
+        if analysis.optimized_sql and analysis.risk_level == 'high':
+            logger.info("🚀 Applying query optimization for high-risk query")
+            sql = analysis.optimized_sql
+        
+        # Apply aggressive optimization for very complex queries
+        try:
+            from ..models.query_optimizer import QueryOptimizer
+            optimizer = QueryOptimizer()
+            if optimizer._is_very_complex_query(sql):
+                aggressive_sql = optimizer._apply_aggressive_optimization(sql)
+                if aggressive_sql != sql:
+                    logger.info("⚡ Applied aggressive optimization for very complex query")
+                    sql = aggressive_sql
+        except Exception as e:
+            logger.warning(f"⚠️ Aggressive optimization failed: {e}")
+        
+        # Log recommendations for future improvements
+        if analysis.recommendations:
+            logger.info(f"💡 Performance recommendations: {'; '.join(analysis.recommendations[:3])}")
+            
+    except ValueError:
+        # Re-raise timeout errors
+        raise
+    except Exception as e:
+        logger.warning(f"⚠️ Query performance analysis failed: {e}")
     
     plan.sql = sql
     return plan
