@@ -159,13 +159,12 @@ Thumbs.db
 ehthumbs.db
 Thumbs.db
 
-# Test results and temporary files
+# Test results and temporary files (now organized in test_results/)
+# Keep test_results/ directory but ignore individual CSV files
 test_results_*.csv
 test_results_*.json
 test_results_*.xlsx
 temp_*.py
-debug_*.py
-quick_*.py
 
 # Cache directories
 .cache/
@@ -190,15 +189,11 @@ uv.lock
 # Keep TestCases (1).xlsx as it's part of the project requirements
 # test_results_questions_and_sql.md - keeping this as it's a deliverable
 
-# Temporary debug and test files
-debug_imports.py
-debug_sql.py
-test_cache_integration.py
-run_cache_tests.py
-debug_imports.py
-tests/unit/test_cache_simple.py
-quick_cache_test.py
-test_fallback_detection.py
+# Temporary debug and test files (now organized in tests/manual/)
+# Individual files that might be created during development
+debug_*.py
+temp_test_*.py
+scratch_*.py
 
 # LLM model files (if downloaded locally)
 models/
