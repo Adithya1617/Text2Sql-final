@@ -1,0 +1,161 @@
+success,error,generated_sql,execution_success,execution_time,rows_returned,question,expected_sql,test_case_id
+True,,,True,0.003,9,List all branches and their managers' names. Include branches without a manager.,"SELECT b.name AS branch_name, e.name AS manager_name
+FROM branches b
+LEFT JOIN employees e ON b.manager_id = e.id;",1
+True,,,True,0.0272,179,Find the names of customers who have both 'checking' and 'savings' accounts.,"SELECT DISTINCT c.first_name, c.last_name
+FROM customers c
+JOIN accounts a1 ON c.id = a1.customer_id AND a1.type = 'checking'
+JOIN accounts a2 ON c.id = a2.customer_id AND a2.type = 'loan';",2
+True,,,True,0.006,200,List all employees who have handled a transaction for a customer born before 1960.,"SELECT DISTINCT e.name
+FROM employees e
+JOIN transactions t ON e.id = t.employee_id
+JOIN accounts a ON t.account_id = a.id
+WHERE e.branch_id <> a.branch_id;",3
+True,,,True,0.003,4,Find the total number of accounts for each customer gender.,"SELECT c.first_name, c.last_name, COUNT(a.id) AS total_accounts
+FROM customers c
+JOIN accounts a ON c.id = a.customer_id
+GROUP BY c.id;",4
+False,"SQL Syntax Error: near ""."": syntax error. Please check the generated SQL.",,False,0.0,0,"For each employee position, what is the average salary, but only for positions with an average salary above 80000?","SELECT e.position, AVG(e.salary) AS avg_salary
+FROM employees e
+GROUP BY e.position;",5
+False,SQL Generation failed: Query timeout risk: Potential cartesian product detected - add proper JOINs or LIMIT,,False,0.0,0,Show the average transaction amount for transactions completed in the first quarter of 2025.,"SELECT c.first_name, c.last_name
+FROM customers c
+JOIN accounts a ON c.id = a.customer_id
+GROUP BY c.id
+HAVING COUNT(DISTINCT a.branch_id) > 1;",6
+True,,,True,0.002,1,Which employees were hired in the same month as 'Raymond Jefferson'?,"SELECT b.name AS branch_name, AVG(a.balance) AS avg_balance
+FROM branches b
+JOIN accounts a ON b.id = a.branch_id
+GROUP BY b.id;",7
+False,Request timeout,,False,0.0,0,"For each customer, list their total deposit amount and total withdrawal amount.","SELECT e.name, COUNT(t.id) AS total_transactions
+FROM employees e
+LEFT JOIN transactions t ON e.id = t.employee_id
+GROUP BY e.id;",8
+False,SQL Execution Error: no such column: a.employee_id,,False,0.0,0,Identify employees who have handled transactions for customers from a different branch than their own.,"SELECT c.name, b.name AS branch_name, MAX(a.balance) AS max_balance
+FROM customers c
+JOIN accounts a ON c.id = a.customer_id
+JOIN branches b ON a.branch_id = b.id
+GROUP BY b.id;",9
+False,SQL Generation failed: Query timeout risk: Potential cartesian product detected - add proper JOINs or LIMIT,,False,0.0,0,Find the names of branches where the average salary of employees is higher than the overall average employee salary.,"SELECT b.name
+FROM branches b
+LEFT JOIN accounts a ON b.id = a.branch_id
+LEFT JOIN transactions t ON a.id = t.account_id
+WHERE t.id IS NULL;",10
+True,,,True,0.006,200,List customers who have a 'credit' account and have made at least one 'fee' transaction.,"SELECT e.name
+FROM employees e
+LEFT JOIN branches b ON e.id = b.manager_id
+WHERE b.manager_id IS NULL;",11
+True,,,True,0.0032,200,Show customers who have the same first name but different last names.,"SELECT b.name, SUM(t.amount) AS total_deposits
+FROM branches b
+JOIN accounts a ON b.id = a.branch_id
+JOIN transactions t ON a.id = t.account_id
+WHERE t.type = 'deposit'
+GROUP BY b.id;",12
+True,,,True,0.001,5,List the branches where the total salary of employees is less than 500000.,"SELECT a.id, c.name, a.balance
+FROM accounts a
+JOIN customers c ON a.customer_id = c.id
+WHERE a.type = 'loan'
+ORDER BY a.balance DESC
+LIMIT 1;",13
+True,,,True,0.001,3,Show the email and phone number of customers who have a 'loan' account with a balance greater than 20000.,"SELECT e.name, e.salary
+FROM employees e
+WHERE e.salary > (SELECT AVG(salary) FROM employees);",14
+False,SQL Execution Error: no such table: positions,,False,0.0,0,"For each employee position, list the number of employees and their average salary.","SELECT c.first_name, c.last_name, COUNT(t.id) AS transaction_count
+FROM customers c
+JOIN accounts a ON c.id = a.customer_id
+JOIN transactions t ON a.id = t.account_id
+GROUP BY c.id
+HAVING COUNT(t.id) > 10;",15
+False,SQL Generation failed: Query timeout risk: Potential cartesian product detected - add proper JOINs or LIMIT,,False,0.0,0,List all transactions that occurred on a weekend (Saturday or Sunday).,"SELECT b.name, COUNT(e.id) AS total_employees
+FROM branches b
+JOIN employees e ON b.id = e.branch_id
+GROUP BY b.id
+HAVING COUNT(e.id) > 5;",16
+True,,,True,0.2122,200,Find the customers who have made transactions on consecutive days.,"SELECT c.first_name, c.last_name
+FROM customers c
+WHERE c.id NOT IN (
+    SELECT a.customer_id FROM accounts a WHERE a.type = 'loan'
+);",17
+True,,,True,0.0147,4,List all accounts that have more deposits than withdrawals in terms of count.,"SELECT e.name, COUNT(t.id) AS total_tx
+FROM employees e
+JOIN transactions t ON e.id = t.employee_id
+GROUP BY e.id
+ORDER BY total_tx DESC
+LIMIT 1;",18
+True,,,True,0.008,0,"For each customer, list their first name, last name, and the total number of transactions they made in the year 2024.","SELECT c.first_name, c.last_name
+FROM customers c
+JOIN accounts a ON c.id = a.customer_id
+GROUP BY c.id
+HAVING COUNT(DISTINCT a.branch_id) = (SELECT COUNT(*) FROM branches);",19
+True,,,True,0.006,1,Find the average balance of accounts that have had at least one transaction.,"SELECT b.name, SUM(a.balance) AS total_balance
+FROM branches b
+JOIN accounts a ON b.id = a.branch_id
+GROUP BY b.id
+ORDER BY total_balance DESC
+LIMIT 1;",20
+False,SQL Execution Error: no such column: e.last_name,,False,0.0,0,Get the names of customers who have the same last name as their branch manager.,"SELECT c.first_name, c.last_name, SUM(a.balance) AS total_balance
+FROM customers c
+JOIN accounts a ON c.id = a.customer_id
+GROUP BY c.id;",21
+True,,,True,0.013,200,List all accounts that have never had a 'withdrawal' transaction.,"SELECT e.name
+FROM employees e
+JOIN branches b ON e.branch_id = b.id
+WHERE b.manager_id IS NOT NULL AND e.id <> b.manager_id;",22
+True,,,True,0.002,15,"Show the average salary of employees for each branch, only considering employees hired after 2020.","SELECT DISTINCT c.first_name, c.last_name
+FROM customers c
+JOIN accounts a ON c.id = a.customer_id
+JOIN transactions t ON a.id = t.account_id
+WHERE t.type = 'withdrawal' AND t.amount > 5000;",23
+False,SQL Execution Error: misuse of aggregate function SUM(),,False,0.0,0,List customers who have a total transaction amount (sum of all their transactions) greater than 50000.,"SELECT b.name, COUNT(a.id) AS loan_accounts
+FROM branches b
+JOIN accounts a ON b.id = a.branch_id
+WHERE a.type = 'loan'
+GROUP BY b.id
+ORDER BY loan_accounts DESC
+LIMIT 1;",24
+True,,,True,0.0,1,Find the branch with the most diverse set of employee positions.,"SELECT e.name
+FROM employees e
+LEFT JOIN transactions t ON e.id = t.employee_id
+WHERE t.id IS NULL;",25
+False,SQL Generation failed: Query timeout risk: Potential cartesian product detected - add proper JOINs or LIMIT,,False,0.0,0,"Find the total number of customers for each gender, excluding 'prefer_not_to_say'.","SELECT c.first_name, c.last_name, a.open_date
+FROM customers c
+JOIN accounts a ON c.id = a.customer_id
+WHERE a.open_date <= DATE('now', '-10 years');",26
+True,,,True,0.007,200,List all customers who have exactly two accounts.,"SELECT b.name, SUM(a.balance) AS loan_balance
+FROM branches b
+JOIN accounts a ON b.id = a.branch_id
+WHERE a.type = 'loan'
+GROUP BY b.id;",27
+True,,,True,0.0,9,Get the names of branches that have no managers assigned yet.,"SELECT e.name, e.salary
+FROM employees e
+ORDER BY e.salary DESC
+LIMIT 1;",28
+True,,,True,0.001,0,Show the names of branches that have an employee named 'Michael'.,"SELECT t.*
+FROM transactions t
+WHERE t.transaction_date >= DATE('now', '-30 days');",29
+True,,,True,0.003,0,List customers who share the same address with another customer.,"SELECT DISTINCT c.first_name, c.last_name
+FROM customers c
+JOIN accounts a1 ON c.id = a1.customer_id AND a1.type = 'savings'
+JOIN accounts a2 ON c.id = a2.customer_id AND a2.type = 'checking';",30
+True,,,True,0.0258,1,Find the branch that has the highest number of 'completed' transactions.,"SELECT b.name
+FROM branches b
+LEFT JOIN employees e ON b.id = e.branch_id
+WHERE e.id IS NULL;",31
+True,,,True,0.008,200,Show the names of employees who have never handled a 'failed' transaction.,"SELECT c.first_name, c.last_name, SUM(a.balance) AS total_balance
+FROM customers c
+JOIN accounts a ON c.id = a.customer_id
+GROUP BY c.id
+ORDER BY total_balance DESC
+LIMIT 5;",32
+True,,,True,0.006,2,"List customers who have a credit account and a loan account, and their combined balance for these two types is greater than 30000.","SELECT a.type, COUNT(a.id) AS total_accounts
+FROM accounts a
+GROUP BY a.type;",33
+False,SQL Execution Error: no such function: age,,False,0.0,0,Find the average balance of accounts for customers whose age is between 30 and 40.,"SELECT c.first_name, c.last_name
+FROM customers c
+LEFT JOIN accounts a ON c.id = a.customer_id
+LEFT JOIN transactions t ON a.id = t.account_id
+WHERE t.id IS NULL;",34
+False,SQL Generation failed: Query timeout risk: Potential cartesian product detected - add proper JOINs or LIMIT,,False,0.0,0,Show the names of branches that have at least one employee from every position type present in the 'employees' table.,"SELECT e.name, SUM(t.amount) AS total_processed
+FROM employees e
+JOIN transactions t ON e.id = t.employee_id
+GROUP BY e.id;",35
