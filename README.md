@@ -511,7 +511,7 @@ For support and questions:
 
 - **v0.1.0** - Initial release with core functionality
 - **v0.4.0** - Enhanced security and audit features
-- **Latest** - Pure LLM-based system with enhanced performance optimizations
+- **Latest** - Pure LLM-based system with enhanced performance optimi zations
 
 ---
 

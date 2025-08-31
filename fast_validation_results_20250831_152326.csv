@@ -1,0 +1,36 @@
+success,error,generated_sql,execution_success,execution_time,rows_returned,question,expected_sql,test_case_id
+True,,,True,0.003,9,List all branches and their managers' names. Include branches without a manager.,"SELECT b.name AS branch_name, e.name AS manager_name
+FROM branches b
+LEFT JOIN employees e ON b.manager_id = e.id;",1
+True,,,True,0.007,179,Find the names of customers who have both 'checking' and 'savings' accounts.,"SELECT DISTINCT c.first_name, c.last_name
+FROM customers c
+JOIN accounts a1 ON c.id = a1.customer_id AND a1.type = 'checking'
+JOIN accounts a2 ON c.id = a2.customer_id AND a2.type = 'loan';",2
+True,,,True,0.005,200,List all employees who have handled a transaction for a customer born before 1960.,"SELECT DISTINCT e.name
+FROM employees e
+JOIN transactions t ON e.id = t.employee_id
+JOIN accounts a ON t.account_id = a.id
+WHERE e.branch_id <> a.branch_id;",3
+True,,,True,0.004,4,Find the total number of accounts for each customer gender.,"SELECT c.first_name, c.last_name, COUNT(a.id) AS total_accounts
+FROM customers c
+JOIN accounts a ON c.id = a.customer_id
+GROUP BY c.id;",4
+False,"SQL Syntax Error: near ""."": syntax error. Please check the generated SQL.",,False,0.0,0,"For each employee position, what is the average salary, but only for positions with an average salary above 80000?","SELECT e.position, AVG(e.salary) AS avg_salary
+FROM employees e
+GROUP BY e.position;",5
+True,,,True,0.0151,200,List customers who have a 'credit' account and have made at least one 'fee' transaction.,"SELECT e.name
+FROM employees e
+LEFT JOIN branches b ON e.id = b.manager_id
+WHERE b.manager_id IS NULL;",11
+True,,,True,0.004,200,Show customers who have the same first name but different last names.,"SELECT b.name, SUM(t.amount) AS total_deposits
+FROM branches b
+JOIN accounts a ON b.id = a.branch_id
+JOIN transactions t ON a.id = t.account_id
+WHERE t.type = 'deposit'
+GROUP BY b.id;",12
+True,,,True,0.002,5,List the branches where the total salary of employees is less than 500000.,"SELECT a.id, c.name, a.balance
+FROM accounts a
+JOIN customers c ON a.customer_id = c.id
+WHERE a.type = 'loan'
+ORDER BY a.balance DESC
+LIMIT 1;",13
